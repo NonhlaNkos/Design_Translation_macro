@@ -1,0 +1,122 @@
+
+!START 00 Data_Preparation  
+# - Use !LOCDBOFF to look for files outside the local folder 
+# - Use local files by deleting the next line or use !LOCDBON
+!LOCDBOFF
+
+!LET $date# = ENV(date)
+
+!LET $time# = ENV(time) 
+
+!PROMPT
+0
+0 Date: $date# Time: $time# 
+0
+0 This macro is a two part Process
+0 Process "Data Preparation" will 
+0 project the Data
+0 To a level section
+0 And process two "Design Translation" 
+0 will translate the Data
+0 By the defined z- elevation
+0 ==========
+0 Part 1 of 2
+0
+0 1. Input file name
+0 ==========
+0 Design file name > '$ofile#',A,24
+0
+0 2. Output file name
+0 ==========
+0 Output file name > '$cfile#',A,24
+0
+0 3. Design projection type? (FW/HW)
+0 ==========
+0 [HW/FW]>'$var#',A,2
+0
+
+!LET $ofile#=dcm_2.2m_UNIQUE_lower
+!LET $cfile#=lower_test
+!LET $var#=FW
+
+#!SYSFILE $exists1#=dcm_2.2m_UNIQUE_lower2
+
+!IF $var#=FW, THEN
+    !EXTRA    &IN($ofile#),
+    &OUT(temp1),@APPROX=0.0
+    ZP=0
+    GO
+
+    !CHECKIT  &IN(temp1),
+          &OUT($cfile#)
+
+
+!ELSEIF $var#=HW, THEN
+    !EXTRA    &IN($ofile#),
+    &OUT(temp1),@APPROX=0.0
+    ZP=5000
+    GO
+
+    !CHECKIT  &IN(temp1),
+          &OUT($cfile#)
+
+!ENDIF
+!DELETE  &IN(temp1)
+
+!PROMPT
+0
+1 Data preparation complete! file saved : $cfile#
+0 Finish Time: $time#, $date#
+0
+0
+0
+
+!END
+
+!START 01 Design_Translation
+!PROMPT
+0
+0 This macro is a two part Process
+0 Process "Data Preparation" will project the Data
+0 To a level section
+0 And process two "Design Translation" will translate the Data
+0 By the defined z- elevation
+0 ==========
+0 Part 2 of 2
+0
+0 1. Input file name
+0 ==========
+0 1 Design file name > '$ofile#',A,24
+0
+0 2. Output file name
+0 ==========
+0 1 Output file name > '$cfile#',A,24
+0
+0 3. What is the translation distance? (1.5/2.2)
+0 ==========
+0 1 Distance> '$var2#',n
+0 
+
+!LET $ofile#=lower_test
+!LET $cfile#=final_projection
+!LET $var2#=2.2
+
+!EXTRA    &IN($ofile#),
+          &OUT(temp3),@APPROX=0.0
+ZP=ZP+$var2#
+GO
+
+!APPEND   &IN1($ofile#),
+          &IN2(temp3),
+          &OUT(temp4),@SEQUENCE=0.0,@PROTODD=0.0
+!CHECKIT  &IN(temp4),
+          &OUT($cfile#)
+
+!DELETE   &IN(temp3)
+!DELETE   &IN(temp4)
+
+#What is done by Echo, can also be done by !PROMPT
+!ECHO +-------------------------
+!ECHO Process complete, file saved as: $cfile#
+!ECHO +-------------------------
+!END
