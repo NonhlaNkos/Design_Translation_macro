@@ -1,3 +1,7 @@
+#This is version 1 of bulk changes that had to be conducted on a block model from Leap Frog
+#More changes updates will be done to optimise how this macro has been written. 
+
+
 !START Bulk_BloMg
 # - Use !LOCDBOFF to look for files outside the local folder 
 # - Use local files by deleting the next line or use !LOCDBON
